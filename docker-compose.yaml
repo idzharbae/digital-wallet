@@ -1,0 +1,28 @@
+version: '3.9'
+services:
+  digital-wallet-postgres:
+    image: postgres:16
+    container_name: digital-wallet-postgres
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: digital_wallet
+    ports:
+      - 5432:5432
+  digital-wallet-redis:
+    image: redis:7.2
+    container_name: digital-wallet-redis
+    ports:
+      - '6379:6379'
+  digital-wallet-rabbitmq:
+    image: 'arm64v8/rabbitmq:3.13.4-management-alpine'
+    # image: 'rabbitmq:3.13.4-management-alpine' # use this one for amd64 arch
+    volumes:
+      - ./rabbit-mq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+    ports:
+      - "15672:15672"
+      - "5673:5673"
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status"]
+      interval: 5s
+      timeout: 15s
+      retries: 5
