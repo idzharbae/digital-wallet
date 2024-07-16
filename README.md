@@ -13,6 +13,7 @@ migrate create -ext sql -dir database/migration/ -seq migration_name
 
 ## Running the App
 ```
+cp .env.example .env
 docker-compose up -d
 make run
 ```
