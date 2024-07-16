@@ -3,7 +3,7 @@
 ## Running migrations
 ```
 docker-compose up -d
-
+make migrate
 ```
 
 ## Creating migration
