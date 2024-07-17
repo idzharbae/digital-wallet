@@ -49,7 +49,9 @@ func SetupApp(conf AppConf) (*DigitalWalletApp, error) {
 	rmqConsumer := rabbitmq.NewConsumer(rmqConsumerConn, pgPool, redisClient)
 
 	userTokenRepo := repository.NewUserToken(pgPool, redisClient)
-	userUC := usecase.NewUser(userTokenRepo)
+	userBalanceRepo := repository.NewUserBalance(pgPool, redisClient)
+	transactionHandler := repository.NewTransactionHandler(pgPool)
+	userUC := usecase.NewUser(userTokenRepo, userBalanceRepo, transactionHandler)
 	httpServer := http.NewServer(rmqProducer, pgPool, redisClient, userUC)
 
 	return &DigitalWalletApp{

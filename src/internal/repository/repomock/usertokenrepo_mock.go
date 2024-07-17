@@ -13,6 +13,8 @@ import (
 	context "context"
 	reflect "reflect"
 
+	repository "github.com/idzharbae/digital-wallet/src/internal/repository"
+	pgx "github.com/jackc/pgx/v5"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -51,4 +53,18 @@ func (m *MockUserTokenRepository) InsertUserToken(arg0 context.Context, arg1, ar
 func (mr *MockUserTokenRepositoryMockRecorder) InsertUserToken(arg0, arg1, arg2 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertUserToken", reflect.TypeOf((*MockUserTokenRepository)(nil).InsertUserToken), arg0, arg1, arg2)
+}
+
+// WithTransaction mocks base method.
+func (m *MockUserTokenRepository) WithTransaction(arg0 pgx.Tx) repository.UserTokenRepository {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "WithTransaction", arg0)
+	ret0, _ := ret[0].(repository.UserTokenRepository)
+	return ret0
+}
+
+// WithTransaction indicates an expected call of WithTransaction.
+func (mr *MockUserTokenRepositoryMockRecorder) WithTransaction(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "WithTransaction", reflect.TypeOf((*MockUserTokenRepository)(nil).WithTransaction), arg0)
 }

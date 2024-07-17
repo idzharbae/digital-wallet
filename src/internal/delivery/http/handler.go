@@ -8,6 +8,7 @@ import (
 	"github.com/idzharbae/digital-wallet/src/internal/constants"
 	"github.com/idzharbae/digital-wallet/src/internal/delivery/http/dto"
 	"github.com/idzharbae/digital-wallet/src/internal/entity"
+	"github.com/idzharbae/digital-wallet/src/internal/utils"
 	"github.com/palantir/stacktrace"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
@@ -96,7 +97,7 @@ func (s *HttpServer) RegisterUser(c *gin.Context) {
 			Msg("Error occurred while binding request data")
 
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": binderr.Error(),
+			"message": "invalid request json",
 		})
 		return
 	}
@@ -108,10 +109,25 @@ func (s *HttpServer) RegisterUser(c *gin.Context) {
 		return
 	}
 
+	if len(request.Username) > 256 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "username is too long",
+		})
+		return
+	}
+
+	if !utils.ValidateUserName(request.Username) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "username must start with alphabet and must be alphanumeric",
+		})
+		return
+	}
+
 	token, err := s.userUC.RegisterUser(c.Request.Context(), request.Username)
 	if err != nil {
+		log.Error().Err(err).Ctx(c.Request.Context()).Msg("Failed to register user")
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
+			"message": "failed to register user",
 		})
 		return
 	}

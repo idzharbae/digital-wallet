@@ -49,7 +49,7 @@ func TestHttpHandler(t *testing.T) {
 
 			var response Response
 			json.NewDecoder(w.Body).Decode(&response)
-			So(response.Message, ShouldEqual, "Error!")
+			So(response.Message, ShouldEqual, "failed to register user")
 			So(w.Code, ShouldEqual, 500)
 		})
 
