@@ -1,0 +1,187 @@
+{
+	"info": {
+		"_postman_id": "885e041c-1161-49a1-8fdd-5e165e792ede",
+		"name": "Digital Wallet",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "4263337"
+	},
+	"item": [
+		{
+			"name": "register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"testing_user\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:6000/v1/create_user",
+					"host": [
+						"localhost"
+					],
+					"port": "6000",
+					"path": [
+						"v1",
+						"create_user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Balance",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "424aa4c6-8bd2-4593-ad21-b45acd3e18e0",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "localhost:6000/v1/balance_read",
+					"host": [
+						"localhost"
+					],
+					"port": "6000",
+					"path": [
+						"v1",
+						"balance_read"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get User Top Transactions",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "d97a01b3-bef3-41e1-a10c-3fc6fd0357cb",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "localhost:6000/v1/top_transactions_per_user",
+					"host": [
+						"localhost"
+					],
+					"port": "6000",
+					"path": [
+						"v1",
+						"top_transactions_per_user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Top Users",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "d284f0d8-fd73-452c-9c75-f811047320c7",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "localhost:6000/v1/top_users",
+					"host": [
+						"localhost"
+					],
+					"port": "6000",
+					"path": [
+						"v1",
+						"top_users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Balance Topup",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "d97a01b3-bef3-41e1-a10c-3fc6fd0357cb",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"amount\": 12345\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:6000/v1/balance_topup",
+					"host": [
+						"localhost"
+					],
+					"port": "6000",
+					"path": [
+						"v1",
+						"balance_topup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Transfer",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "424aa4c6-8bd2-4593-ad21-b45acd3e18e0",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Authorization",
+						"value": "4ddc18e1-10cd-4e2a-a660-e468538ceba5",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"to_username\": \"recipientz\",\n    \"amount\": 123\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:6000/v1/transfer",
+					"host": [
+						"localhost"
+					],
+					"port": "6000",
+					"path": [
+						"v1",
+						"transfer"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
