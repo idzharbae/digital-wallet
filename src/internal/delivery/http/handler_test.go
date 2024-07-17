@@ -18,7 +18,7 @@ func TestHttpHandler(t *testing.T) {
 	Convey("Test Register User", t, func() {
 		ctrl := gomock.NewController(t)
 		ucMock := ucmock.NewMockUserUC(ctrl)
-		server := http.NewServer(nil, nil, nil, ucMock)
+		server := http.NewServer(nil, nil, nil, ucMock, nil)
 
 		type Response struct {
 			Message string `json:"message"`

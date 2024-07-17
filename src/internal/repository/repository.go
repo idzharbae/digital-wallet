@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 
+	"github.com/idzharbae/digital-wallet/src/internal/entity"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -30,4 +31,14 @@ type UserBalanceRepository interface {
 	GetUserBalanceForUpdate(ctx context.Context, username string) (int, error)
 
 	WithTransaction(tx pgx.Tx) UserBalanceRepository
+}
+
+type UserTransactionRepository interface {
+	InsertTransaction(ctx context.Context, username, secondPartyUsername string, transactionType entity.TransactionType, amount int) error
+	UpsertTotalDebit(ctx context.Context, username string, amount int) error
+	GetTopTransactingUsers(ctx context.Context) ([]entity.TotalDebit, error)
+	RefreshTopTransactingUsers(ctx context.Context) ([]entity.TotalDebit, error)
+	GetUserTopTransactions(ctx context.Context, username string) ([]entity.UserTransaction, error)
+
+	WithTransaction(tx pgx.Tx) UserTransactionRepository
 }

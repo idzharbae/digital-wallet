@@ -50,6 +50,8 @@ func main() {
 		}
 	}()
 
+	app.Cron.Start()
+
 	for err := range errChan {
 		log.Error().Err(err).Msg("received error from one of the delivery layer")
 		os.Exit(1)

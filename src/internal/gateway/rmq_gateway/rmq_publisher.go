@@ -2,7 +2,6 @@ package rmq_gateway
 
 import (
 	"github.com/palantir/stacktrace"
-	"github.com/rs/zerolog/log"
 
 	"github.com/streadway/amqp"
 )
@@ -29,13 +28,7 @@ func NewProducer(connectionString string) (*RMQProducer, error) {
 	}, nil
 }
 
-func (x *RMQProducer) OnError(queueName string, err error, msg string) {
-	if err != nil {
-		log.Err(err).Msgf("Error occurred while publishing message on '%s' queue. Error message: %s", queueName, msg)
-	}
-}
-
-func (x *RMQProducer) PublishMessage(queueName string, contentType string, body []byte) {
+func (x *RMQProducer) PublishMessage(queueName string, contentType string, body []byte) error {
 	q, err := x.ch.QueueDeclare(
 		queueName, // name
 		false,     // durable
@@ -44,7 +37,9 @@ func (x *RMQProducer) PublishMessage(queueName string, contentType string, body 
 		false,     // no-wait
 		nil,       // arguments
 	)
-	x.OnError(queueName, err, "Failed to declare a queue")
+	if err != nil {
+		return stacktrace.Propagate(err, "PublishMessage: failed to declare queue")
+	}
 
 	err = x.ch.Publish(
 		"",     // exchange
@@ -55,5 +50,9 @@ func (x *RMQProducer) PublishMessage(queueName string, contentType string, body 
 			ContentType: contentType,
 			Body:        body,
 		})
-	x.OnError(queueName, err, "Failed to publish a message")
+	if err != nil {
+		return stacktrace.Propagate(err, "PublishMessage: failed to publish message")
+	}
+
+	return nil
 }

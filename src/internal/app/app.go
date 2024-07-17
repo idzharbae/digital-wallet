@@ -3,6 +3,7 @@ package app
 import (
 	"fmt"
 
+	"github.com/idzharbae/digital-wallet/src/internal/delivery/cronjob"
 	"github.com/idzharbae/digital-wallet/src/internal/delivery/http"
 	"github.com/idzharbae/digital-wallet/src/internal/delivery/rabbitmq"
 	"github.com/idzharbae/digital-wallet/src/internal/gateway/postgresql_gateway"
@@ -12,6 +13,7 @@ import (
 	"github.com/idzharbae/digital-wallet/src/internal/usecase"
 	"github.com/idzharbae/digital-wallet/src/internal/utils"
 	"github.com/palantir/stacktrace"
+	"github.com/robfig/cron/v3"
 )
 
 type AppConf struct {
@@ -22,6 +24,7 @@ type AppConf struct {
 type DigitalWalletApp struct {
 	RabbitMq *rabbitmq.RabbitMQConsumer
 	Http     *http.HttpServer
+	Cron     *cronjob.Cron
 }
 
 // Function to setup the app object
@@ -46,16 +49,19 @@ func SetupApp(conf AppConf) (*DigitalWalletApp, error) {
 		utils.GetEnvVar("REDIS_PASS"),
 	)
 
-	rmqConsumer := rabbitmq.NewConsumer(rmqConsumerConn, pgPool, redisClient)
-
 	userTokenRepo := repository.NewUserToken(pgPool, redisClient)
 	userBalanceRepo := repository.NewUserBalance(pgPool, redisClient)
+	userTransactionRepo := repository.NewUserTransaction(pgPool, redisClient)
 	transactionHandler := repository.NewTransactionHandler(pgPool)
 	userUC := usecase.NewUser(userTokenRepo, userBalanceRepo, transactionHandler)
-	httpServer := http.NewServer(rmqProducer, pgPool, redisClient, userUC)
+	transactionUC := usecase.NewTransaction(transactionHandler, userTransactionRepo, userBalanceRepo, rmqProducer)
+	httpServer := http.NewServer(rmqProducer, pgPool, redisClient, userUC, transactionUC)
+	rmqConsumer := rabbitmq.NewConsumer(rmqConsumerConn, pgPool, redisClient, userTransactionRepo)
+	cronJob := cronjob.NewCron(cron.New(), userTransactionRepo)
 
 	return &DigitalWalletApp{
 		RabbitMq: rmqConsumer,
 		Http:     httpServer,
+		Cron:     cronJob,
 	}, nil
 }

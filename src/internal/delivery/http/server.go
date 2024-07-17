@@ -16,10 +16,11 @@ type HttpServer struct {
 	dbConn      *pgxpool.Pool
 	redisClient *redis.Client
 
-	userUC usecase.UserUC
+	userUC        usecase.UserUC
+	transactionUC usecase.TransactionUC
 }
 
-func NewServer(rmqProducer *rmq_gateway.RMQProducer, dbConn *pgxpool.Pool, redisClient *redis.Client, userUC usecase.UserUC) *HttpServer {
+func NewServer(rmqProducer *rmq_gateway.RMQProducer, dbConn *pgxpool.Pool, redisClient *redis.Client, userUC usecase.UserUC, transactionUC usecase.TransactionUC) *HttpServer {
 	log.Info().Msg("Initializing service")
 
 	// Create barebone engine
@@ -35,11 +36,12 @@ func NewServer(rmqProducer *rmq_gateway.RMQProducer, dbConn *pgxpool.Pool, redis
 	engine.Use(middlewares.CORSMiddleware(), middlewares.RequestID(), middlewares.RequestLogger())
 
 	server := &HttpServer{
-		engine:      engine,
-		rmqProducer: rmqProducer,
-		dbConn:      dbConn,
-		redisClient: redisClient,
-		userUC:      userUC,
+		engine:        engine,
+		rmqProducer:   rmqProducer,
+		dbConn:        dbConn,
+		redisClient:   redisClient,
+		userUC:        userUC,
+		transactionUC: transactionUC,
 	}
 
 	// Setup routers
