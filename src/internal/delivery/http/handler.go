@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/idzharbae/digital-wallet/src/internal/constants"
+	"github.com/idzharbae/digital-wallet/src/internal/delivery/http/dto"
 	"github.com/idzharbae/digital-wallet/src/internal/entity"
 	"github.com/palantir/stacktrace"
 	"github.com/redis/go-redis/v9"
@@ -85,4 +86,37 @@ func (s *HttpServer) ListMessages(c *gin.Context) {
 		log.Error().Err(err).Msg("failed to set redis")
 	}
 	c.JSON(http.StatusOK, messages)
+}
+
+func (s *HttpServer) RegisterUser(c *gin.Context) {
+	request_id := c.GetString("x-request-id")
+	var request dto.RegisterUserRequest
+	if binderr := c.ShouldBindJSON(&request); binderr != nil {
+		log.Error().Err(binderr).Str("request_id", request_id).
+			Msg("Error occurred while binding request data")
+
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": binderr.Error(),
+		})
+		return
+	}
+
+	if len(request.Username) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "username is empty",
+		})
+		return
+	}
+
+	token, err := s.userUC.RegisterUser(request.Username)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"token": token,
+	})
 }

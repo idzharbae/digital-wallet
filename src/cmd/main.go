@@ -15,11 +15,11 @@ func main() {
 
 	rmqConnectionString := utils.GetEnvVar("RMQ_URL")
 	dbUrl := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=disable",
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASS"),
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_PORT"),
-		os.Getenv("DB_NAME"),
+		utils.GetEnvVar("DB_USER"),
+		utils.GetEnvVar("DB_PASS"),
+		utils.GetEnvVar("DB_HOST"),
+		utils.GetEnvVar("DB_PORT"),
+		utils.GetEnvVar("DB_NAME"),
 	)
 
 	app, err := app.SetupApp(app.AppConf{
