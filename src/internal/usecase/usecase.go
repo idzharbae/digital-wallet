@@ -5,4 +5,6 @@ import "context"
 //go:generate mockgen -destination=ucmock/useruc_mock.go -package=ucmock github.com/idzharbae/digital-wallet/src/internal/usecase UserUC
 type UserUC interface {
 	RegisterUser(ctx context.Context, username string) (string, error)
+	GetUserNameFromToken(ctx context.Context, token string) (string, error)
+	GetUserBalance(ctx context.Context, username string) (int, error)
 }

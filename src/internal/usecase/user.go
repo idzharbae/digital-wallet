@@ -52,3 +52,11 @@ func (u *User) RegisterUser(ctx context.Context, username string) (string, error
 
 	return token.String(), nil
 }
+
+func (u *User) GetUserNameFromToken(ctx context.Context, token string) (string, error) {
+	return u.userTokenRepository.GetUserNameByToken(ctx, token)
+}
+
+func (u *User) GetUserBalance(ctx context.Context, username string) (int, error) {
+	return u.userBalanceRepository.GetUserBalance(ctx, username)
+}

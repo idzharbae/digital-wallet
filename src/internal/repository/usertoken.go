@@ -29,6 +29,16 @@ func (ut *userToken) InsertUserToken(ctx context.Context, username string, token
 	return nil
 }
 
+func (ut *userToken) GetUserNameByToken(ctx context.Context, token string) (string, error) {
+	var username string
+	err := ut.dbConn.QueryRow(ctx, `SELECT username FROM user_token WHERE token = $1`, token).Scan(&username)
+	if err != nil {
+		return "", stacktrace.Propagate(err, "GetUserNameByToken: failed to read username from db")
+	}
+
+	return username, nil
+}
+
 func (ub *userToken) WithTransaction(tx pgx.Tx) UserTokenRepository {
 	return &userToken{
 		dbConn:      tx,

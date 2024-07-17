@@ -29,11 +29,14 @@ func TestXxx(t *testing.T) {
 		assert.False(t, result)
 	})
 
-	t.Run("Must return true if it starts with alphabet and is alphanumeric", func(t *testing.T) {
+	t.Run("Must return true if it starts with alphabet and is alphanumeric or underscore", func(t *testing.T) {
 		result := utils.ValidateUserName("testingA123")
 		assert.True(t, result)
 
 		result = utils.ValidateUserName("ABCDefgh9129")
+		assert.True(t, result)
+
+		result = utils.ValidateUserName("ABCDefg_h9129")
 		assert.True(t, result)
 	})
 }

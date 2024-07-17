@@ -39,6 +39,36 @@ func (m *MockUserUC) EXPECT() *MockUserUCMockRecorder {
 	return m.recorder
 }
 
+// GetUserBalance mocks base method.
+func (m *MockUserUC) GetUserBalance(arg0 context.Context, arg1 string) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserBalance", arg0, arg1)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserBalance indicates an expected call of GetUserBalance.
+func (mr *MockUserUCMockRecorder) GetUserBalance(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserBalance", reflect.TypeOf((*MockUserUC)(nil).GetUserBalance), arg0, arg1)
+}
+
+// GetUserNameFromToken mocks base method.
+func (m *MockUserUC) GetUserNameFromToken(arg0 context.Context, arg1 string) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserNameFromToken", arg0, arg1)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserNameFromToken indicates an expected call of GetUserNameFromToken.
+func (mr *MockUserUCMockRecorder) GetUserNameFromToken(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserNameFromToken", reflect.TypeOf((*MockUserUC)(nil).GetUserNameFromToken), arg0, arg1)
+}
+
 // RegisterUser mocks base method.
 func (m *MockUserUC) RegisterUser(arg0 context.Context, arg1 string) (string, error) {
 	m.ctrl.T.Helper()

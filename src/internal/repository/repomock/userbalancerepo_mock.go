@@ -55,6 +55,21 @@ func (mr *MockUserBalanceRepositoryMockRecorder) CreateUserBalance(arg0, arg1 an
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUserBalance", reflect.TypeOf((*MockUserBalanceRepository)(nil).CreateUserBalance), arg0, arg1)
 }
 
+// GetUserBalance mocks base method.
+func (m *MockUserBalanceRepository) GetUserBalance(arg0 context.Context, arg1 string) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserBalance", arg0, arg1)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserBalance indicates an expected call of GetUserBalance.
+func (mr *MockUserBalanceRepositoryMockRecorder) GetUserBalance(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserBalance", reflect.TypeOf((*MockUserBalanceRepository)(nil).GetUserBalance), arg0, arg1)
+}
+
 // WithTransaction mocks base method.
 func (m *MockUserBalanceRepository) WithTransaction(arg0 pgx.Tx) repository.UserBalanceRepository {
 	m.ctrl.T.Helper()

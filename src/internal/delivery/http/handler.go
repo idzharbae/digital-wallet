@@ -1,6 +1,7 @@
 package http
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
 
@@ -118,7 +119,7 @@ func (s *HttpServer) RegisterUser(c *gin.Context) {
 
 	if !utils.ValidateUserName(request.Username) {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "username must start with alphabet and must be alphanumeric",
+			"message": "username must start with alphabet and must be alphanumeric or underscore",
 		})
 		return
 	}
@@ -134,5 +135,43 @@ func (s *HttpServer) RegisterUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"token": token,
+	})
+}
+
+func (s *HttpServer) BalanceRead(c *gin.Context) {
+	userToken := c.GetHeader("Authorization")
+	if len(userToken) == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "header 'Authorization' is empty",
+		})
+		return
+	}
+
+	username, err := s.userUC.GetUserNameFromToken(c.Request.Context(), userToken)
+	if stacktrace.RootCause(err) == sql.ErrNoRows {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "invalid token",
+		})
+		return
+	}
+	if err != nil {
+		log.Error().Err(err).Ctx(c.Request.Context()).Msg("Failed to get user by token")
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "failed to get user information",
+		})
+		return
+	}
+
+	balance, err := s.userUC.GetUserBalance(c.Request.Context(), username)
+	if err != nil {
+		log.Error().Err(err).Ctx(c.Request.Context()).Msg("Failed to get user balance")
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "failed to get user balance",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"balance": balance,
 	})
 }

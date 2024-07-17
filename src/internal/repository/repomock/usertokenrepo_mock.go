@@ -41,6 +41,21 @@ func (m *MockUserTokenRepository) EXPECT() *MockUserTokenRepositoryMockRecorder 
 	return m.recorder
 }
 
+// GetUserNameByToken mocks base method.
+func (m *MockUserTokenRepository) GetUserNameByToken(arg0 context.Context, arg1 string) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserNameByToken", arg0, arg1)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserNameByToken indicates an expected call of GetUserNameByToken.
+func (mr *MockUserTokenRepositoryMockRecorder) GetUserNameByToken(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserNameByToken", reflect.TypeOf((*MockUserTokenRepository)(nil).GetUserNameByToken), arg0, arg1)
+}
+
 // InsertUserToken mocks base method.
 func (m *MockUserTokenRepository) InsertUserToken(arg0 context.Context, arg1, arg2 string) error {
 	m.ctrl.T.Helper()

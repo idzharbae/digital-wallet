@@ -3,4 +3,4 @@ CREATE TABLE public.user_token (
 	"token" varchar(256) NULL,
 	CONSTRAINT user_token_pkey PRIMARY KEY (username)
 );
-CREATE INDEX user_token_token_idx ON public.user_token USING btree (token);
+CREATE INDEX user_token_token_idx ON public.user_token USING HASH (token);
