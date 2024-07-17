@@ -2,11 +2,16 @@ package usecase
 
 import (
 	"context"
+	"errors"
 
 	"github.com/google/uuid"
 	"github.com/idzharbae/digital-wallet/src/internal/repository"
 	"github.com/jackc/pgx/v5"
 	"github.com/palantir/stacktrace"
+)
+
+var (
+	ErrTopUpTooLarge = errors.New("top up amount is too large")
 )
 
 type User struct {
@@ -62,6 +67,10 @@ func (u *User) GetUserBalance(ctx context.Context, username string) (int, error)
 }
 
 func (u *User) TopUpUserBalance(ctx context.Context, username string, topUpAmount int) (int, error) {
+	if topUpAmount >= 10000000 {
+		return 0, ErrTopUpTooLarge
+	}
+
 	var newBalance int
 	err := u.transactionHandler.ExecuteTransaction(ctx, func(tx pgx.Tx) error {
 		trxRepo := u.userBalanceRepository.WithTransaction(tx)

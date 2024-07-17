@@ -102,5 +102,13 @@ func TestUser(t *testing.T) {
 			So(stacktrace.RootCause(err), ShouldResemble, errors.New("error"))
 			So(newBalance, ShouldEqual, 0)
 		})
+
+		Convey("Must return error when amount >= 10000000", func() {
+			username := "test"
+			topUpAmount := 10000000
+
+			_, err := uc.TopUpUserBalance(ctx, username, topUpAmount)
+			So(stacktrace.RootCause(err), ShouldResemble, usecase.ErrTopUpTooLarge)
+		})
 	})
 }

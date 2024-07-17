@@ -9,6 +9,7 @@ import (
 	"github.com/idzharbae/digital-wallet/src/internal/constants"
 	"github.com/idzharbae/digital-wallet/src/internal/delivery/http/dto"
 	"github.com/idzharbae/digital-wallet/src/internal/entity"
+	"github.com/idzharbae/digital-wallet/src/internal/usecase"
 	"github.com/idzharbae/digital-wallet/src/internal/utils"
 	"github.com/palantir/stacktrace"
 	"github.com/redis/go-redis/v9"
@@ -216,6 +217,12 @@ func (s *HttpServer) BalanceTopUp(c *gin.Context) {
 	}
 
 	balance, err := s.userUC.TopUpUserBalance(c.Request.Context(), username, request.Amount)
+	if err == usecase.ErrTopUpTooLarge {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err.Error(),
+		})
+		return
+	}
 	if err != nil {
 		log.Error().Err(err).Ctx(c.Request.Context()).Str("requestId", requestId).Msg("Failed to topup user balance")
 		c.JSON(http.StatusInternalServerError, gin.H{
