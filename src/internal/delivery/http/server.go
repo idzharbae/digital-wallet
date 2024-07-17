@@ -5,22 +5,18 @@ import (
 	"github.com/idzharbae/digital-wallet/src/internal/delivery/http/middlewares"
 	"github.com/idzharbae/digital-wallet/src/internal/gateway/rmq_gateway"
 	"github.com/idzharbae/digital-wallet/src/internal/usecase"
-	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog/log"
 )
 
 type HttpServer struct {
 	engine      *gin.Engine
 	rmqProducer *rmq_gateway.RMQProducer
-	dbConn      *pgxpool.Pool
-	redisClient *redis.Client
 
 	userUC        usecase.UserUC
 	transactionUC usecase.TransactionUC
 }
 
-func NewServer(rmqProducer *rmq_gateway.RMQProducer, dbConn *pgxpool.Pool, redisClient *redis.Client, userUC usecase.UserUC, transactionUC usecase.TransactionUC) *HttpServer {
+func NewServer(rmqProducer *rmq_gateway.RMQProducer, userUC usecase.UserUC, transactionUC usecase.TransactionUC) *HttpServer {
 	log.Info().Msg("Initializing service")
 
 	// Create barebone engine
@@ -38,8 +34,6 @@ func NewServer(rmqProducer *rmq_gateway.RMQProducer, dbConn *pgxpool.Pool, redis
 	server := &HttpServer{
 		engine:        engine,
 		rmqProducer:   rmqProducer,
-		dbConn:        dbConn,
-		redisClient:   redisClient,
 		userUC:        userUC,
 		transactionUC: transactionUC,
 	}
