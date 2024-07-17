@@ -24,12 +24,12 @@ func (s *HttpServer) Ping(c *gin.Context) {
 func (s *HttpServer) SendMessage(c *gin.Context) {
 	var msg entity.Message
 
-	request_id := c.GetString("x-request-id")
+	requestId := c.GetString("x-request-id")
 
 	// Bind request payload with our model
 	if binderr := c.ShouldBindJSON(&msg); binderr != nil {
 
-		log.Error().Err(binderr).Str("request_id", request_id).
+		log.Error().Err(binderr).Str("requestId", requestId).
 			Msg("Error occurred while binding request data")
 
 		c.JSON(http.StatusUnprocessableEntity, gin.H{
@@ -91,10 +91,10 @@ func (s *HttpServer) ListMessages(c *gin.Context) {
 }
 
 func (s *HttpServer) RegisterUser(c *gin.Context) {
-	request_id := c.GetString("x-request-id")
+	requestId := c.GetString("x-request-id")
 	var request dto.RegisterUserRequest
 	if binderr := c.ShouldBindJSON(&request); binderr != nil {
-		log.Error().Err(binderr).Str("request_id", request_id).
+		log.Error().Err(binderr).Str("requestId", requestId).
 			Msg("Error occurred while binding request data")
 
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -139,6 +139,8 @@ func (s *HttpServer) RegisterUser(c *gin.Context) {
 }
 
 func (s *HttpServer) BalanceRead(c *gin.Context) {
+	requestId := c.GetString("x-request-id")
+
 	userToken := c.GetHeader("Authorization")
 	if len(userToken) == 0 {
 		c.JSON(http.StatusUnauthorized, gin.H{
@@ -155,7 +157,7 @@ func (s *HttpServer) BalanceRead(c *gin.Context) {
 		return
 	}
 	if err != nil {
-		log.Error().Err(err).Ctx(c.Request.Context()).Msg("Failed to get user by token")
+		log.Error().Err(err).Ctx(c.Request.Context()).Str("requestId", requestId).Msg("Failed to get user by token")
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "failed to get user information",
 		})
@@ -164,9 +166,60 @@ func (s *HttpServer) BalanceRead(c *gin.Context) {
 
 	balance, err := s.userUC.GetUserBalance(c.Request.Context(), username)
 	if err != nil {
-		log.Error().Err(err).Ctx(c.Request.Context()).Msg("Failed to get user balance")
+		log.Error().Err(err).Ctx(c.Request.Context()).Str("requestId", requestId).Msg("Failed to get user balance")
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "failed to get user balance",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"balance": balance,
+	})
+}
+
+func (s *HttpServer) BalanceTopUp(c *gin.Context) {
+	requestId := c.GetString("x-request-id")
+
+	userToken := c.GetHeader("Authorization")
+	if len(userToken) == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "header 'Authorization' is empty",
+		})
+		return
+	}
+
+	username, err := s.userUC.GetUserNameFromToken(c.Request.Context(), userToken)
+	if stacktrace.RootCause(err) == sql.ErrNoRows {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"message": "invalid token",
+		})
+		return
+	}
+	if err != nil {
+		log.Error().Err(err).Ctx(c.Request.Context()).Str("requestId", requestId).Msg("Failed to get user by token")
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "failed to get user information",
+		})
+		return
+	}
+
+	var request dto.BalanceTopUpRequest
+	if binderr := c.ShouldBindJSON(&request); binderr != nil {
+		log.Error().Err(binderr).Str("requestId", requestId).
+			Msg("Error occurred while binding request data")
+
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "invalid request json",
+		})
+		return
+	}
+
+	balance, err := s.userUC.TopUpUserBalance(c.Request.Context(), username, request.Amount)
+	if err != nil {
+		log.Error().Err(err).Ctx(c.Request.Context()).Str("requestId", requestId).Msg("Failed to topup user balance")
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "failed to topup balance",
 		})
 		return
 	}

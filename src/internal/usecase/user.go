@@ -60,3 +60,27 @@ func (u *User) GetUserNameFromToken(ctx context.Context, token string) (string, 
 func (u *User) GetUserBalance(ctx context.Context, username string) (int, error) {
 	return u.userBalanceRepository.GetUserBalance(ctx, username)
 }
+
+func (u *User) TopUpUserBalance(ctx context.Context, username string, topUpAmount int) (int, error) {
+	var newBalance int
+	err := u.transactionHandler.ExecuteTransaction(ctx, func(tx pgx.Tx) error {
+		trxRepo := u.userBalanceRepository.WithTransaction(tx)
+		currentBalance, err := trxRepo.GetUserBalanceForUpdate(ctx, username)
+		if err != nil {
+			return stacktrace.Propagate(err, "TopUpUserBalance Transaction: failed to get user balance")
+		}
+
+		newBalance = currentBalance + topUpAmount
+		err = trxRepo.UpdateBalance(ctx, username, newBalance)
+		if err != nil {
+			return stacktrace.Propagate(err, "TopUpUserBalance Transaction: failed to update user balance")
+		}
+
+		return nil
+	})
+	if err != nil {
+		return 0, stacktrace.Propagate(err, "TopUpUserBalance: error occured during topup transaction")
+	}
+
+	return newBalance, nil
+}

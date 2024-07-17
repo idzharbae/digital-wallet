@@ -63,6 +63,32 @@ func (ub *userBalance) GetUserBalance(ctx context.Context, username string) (int
 	return balance, nil
 }
 
+func (ub *userBalance) GetUserBalanceForUpdate(ctx context.Context, username string) (int, error) {
+	var balance int
+	err := ub.dbConn.QueryRow(ctx, `SELECT balance FROM user_balance WHERE username = $1 FOR UPDATE`, username).Scan(&balance)
+	if err != nil {
+		return 0, stacktrace.Propagate(err, "GetUserBalanceForUpdate: failed to read user balance for username %s", username)
+	}
+
+	return balance, nil
+}
+
+func (ub *userBalance) UpdateBalance(ctx context.Context, username string, balance int) error {
+	_, err := ub.dbConn.Exec(ctx, `UPDATE user_balance SET balance = $1 WHERE username = $2`, balance, username)
+	if err != nil {
+		return stacktrace.Propagate(err, "UpdateBalance: failed to update user balance for username %s", username)
+	}
+
+	// Clear redis
+	redisKey := fmt.Sprintf(UserBalanceKey, username)
+	err = ub.redisClient.Del(ctx, redisKey).Err()
+	if err != nil {
+		log.Error().Err(err).Msg(fmt.Sprintf("UpdateBalance: failed to clear user balance redis for user %s", username))
+	}
+
+	return nil
+}
+
 func (ub *userBalance) WithTransaction(tx pgx.Tx) UserBalanceRepository {
 	return &userBalance{
 		dbConn:      tx,

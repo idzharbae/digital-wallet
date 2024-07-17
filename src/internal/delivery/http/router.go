@@ -8,5 +8,6 @@ func (s *HttpServer) SetupRouters() {
 		v1.POST("/publish/example", s.SendMessage)
 		v1.POST("/create_user", s.RegisterUser)
 		v1.GET("/balance_read", s.BalanceRead)
+		v1.POST("/balance_topup", s.BalanceTopUp)
 	}
 }

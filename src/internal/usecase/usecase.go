@@ -7,4 +7,5 @@ type UserUC interface {
 	RegisterUser(ctx context.Context, username string) (string, error)
 	GetUserNameFromToken(ctx context.Context, token string) (string, error)
 	GetUserBalance(ctx context.Context, username string) (int, error)
+	TopUpUserBalance(ctx context.Context, username string, topUpAmount int) (int, error)
 }

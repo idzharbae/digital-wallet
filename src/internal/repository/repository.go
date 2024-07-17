@@ -17,13 +17,17 @@ type TransactionHandler interface {
 //go:generate mockgen -destination=repomock/usertokenrepo_mock.go -package=repomock github.com/idzharbae/digital-wallet/src/internal/repository UserTokenRepository
 type UserTokenRepository interface {
 	InsertUserToken(ctx context.Context, username, token string) error
-	WithTransaction(tx pgx.Tx) UserTokenRepository
 	GetUserNameByToken(ctx context.Context, token string) (string, error)
+
+	WithTransaction(tx pgx.Tx) UserTokenRepository
 }
 
 //go:generate mockgen -destination=repomock/userbalancerepo_mock.go -package=repomock github.com/idzharbae/digital-wallet/src/internal/repository UserBalanceRepository
 type UserBalanceRepository interface {
 	CreateUserBalance(ctx context.Context, username string) error
 	GetUserBalance(ctx context.Context, username string) (int, error)
+	UpdateBalance(ctx context.Context, username string, balance int) error
+	GetUserBalanceForUpdate(ctx context.Context, username string) (int, error)
+
 	WithTransaction(tx pgx.Tx) UserBalanceRepository
 }

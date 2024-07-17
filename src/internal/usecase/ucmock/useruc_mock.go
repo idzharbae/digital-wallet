@@ -83,3 +83,18 @@ func (mr *MockUserUCMockRecorder) RegisterUser(arg0, arg1 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RegisterUser", reflect.TypeOf((*MockUserUC)(nil).RegisterUser), arg0, arg1)
 }
+
+// TopUpUserBalance mocks base method.
+func (m *MockUserUC) TopUpUserBalance(arg0 context.Context, arg1 string, arg2 int) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "TopUpUserBalance", arg0, arg1, arg2)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// TopUpUserBalance indicates an expected call of TopUpUserBalance.
+func (mr *MockUserUCMockRecorder) TopUpUserBalance(arg0, arg1, arg2 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TopUpUserBalance", reflect.TypeOf((*MockUserUC)(nil).TopUpUserBalance), arg0, arg1, arg2)
+}

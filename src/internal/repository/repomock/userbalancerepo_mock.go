@@ -70,6 +70,35 @@ func (mr *MockUserBalanceRepositoryMockRecorder) GetUserBalance(arg0, arg1 any) 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserBalance", reflect.TypeOf((*MockUserBalanceRepository)(nil).GetUserBalance), arg0, arg1)
 }
 
+// GetUserBalanceForUpdate mocks base method.
+func (m *MockUserBalanceRepository) GetUserBalanceForUpdate(arg0 context.Context, arg1 string) (int, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetUserBalanceForUpdate", arg0, arg1)
+	ret0, _ := ret[0].(int)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetUserBalanceForUpdate indicates an expected call of GetUserBalanceForUpdate.
+func (mr *MockUserBalanceRepositoryMockRecorder) GetUserBalanceForUpdate(arg0, arg1 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUserBalanceForUpdate", reflect.TypeOf((*MockUserBalanceRepository)(nil).GetUserBalanceForUpdate), arg0, arg1)
+}
+
+// UpdateBalance mocks base method.
+func (m *MockUserBalanceRepository) UpdateBalance(arg0 context.Context, arg1 string, arg2 int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateBalance", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateBalance indicates an expected call of UpdateBalance.
+func (mr *MockUserBalanceRepositoryMockRecorder) UpdateBalance(arg0, arg1, arg2 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateBalance", reflect.TypeOf((*MockUserBalanceRepository)(nil).UpdateBalance), arg0, arg1, arg2)
+}
+
 // WithTransaction mocks base method.
 func (m *MockUserBalanceRepository) WithTransaction(arg0 pgx.Tx) repository.UserBalanceRepository {
 	m.ctrl.T.Helper()
