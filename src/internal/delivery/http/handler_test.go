@@ -43,7 +43,7 @@ func TestHttpHandler(t *testing.T) {
 			c, _ := gin.CreateTestContext(w)
 			c.Request = httptest.NewRequest("POST", "/create_user", strings.NewReader(`{"username": "test"}`))
 
-			ucMock.EXPECT().RegisterUser("test").Return("", errors.New("Error!"))
+			ucMock.EXPECT().RegisterUser(c.Request.Context(), "test").Return("", errors.New("Error!"))
 
 			server.RegisterUser(c)
 
@@ -58,7 +58,7 @@ func TestHttpHandler(t *testing.T) {
 			c, _ := gin.CreateTestContext(w)
 			c.Request = httptest.NewRequest("POST", "/create_user", strings.NewReader(`{"username": "test"}`))
 
-			ucMock.EXPECT().RegisterUser("test").Return("asdfg", nil)
+			ucMock.EXPECT().RegisterUser(c.Request.Context(), "test").Return("asdfg", nil)
 
 			server.RegisterUser(c)
 

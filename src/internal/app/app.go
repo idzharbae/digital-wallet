@@ -8,6 +8,8 @@ import (
 	"github.com/idzharbae/digital-wallet/src/internal/gateway/postgresql_gateway"
 	"github.com/idzharbae/digital-wallet/src/internal/gateway/redis_gateway"
 	"github.com/idzharbae/digital-wallet/src/internal/gateway/rmq_gateway"
+	"github.com/idzharbae/digital-wallet/src/internal/repository"
+	"github.com/idzharbae/digital-wallet/src/internal/usecase"
 	"github.com/idzharbae/digital-wallet/src/internal/utils"
 	"github.com/palantir/stacktrace"
 )
@@ -45,7 +47,10 @@ func SetupApp(conf AppConf) (*DigitalWalletApp, error) {
 	)
 
 	rmqConsumer := rabbitmq.NewConsumer(rmqConsumerConn, pgPool, redisClient)
-	httpServer := http.NewServer(rmqProducer, pgPool, redisClient, nil)
+
+	userTokenRepo := repository.NewUserToken(pgPool, redisClient)
+	userUC := usecase.NewUser(userTokenRepo)
+	httpServer := http.NewServer(rmqProducer, pgPool, redisClient, userUC)
 
 	return &DigitalWalletApp{
 		RabbitMq: rmqConsumer,

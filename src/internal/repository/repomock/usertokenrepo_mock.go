@@ -10,6 +10,7 @@
 package repomock
 
 import (
+	context "context"
 	reflect "reflect"
 
 	gomock "go.uber.org/mock/gomock"
@@ -39,15 +40,15 @@ func (m *MockUserTokenRepository) EXPECT() *MockUserTokenRepositoryMockRecorder 
 }
 
 // InsertUserToken mocks base method.
-func (m *MockUserTokenRepository) InsertUserToken(arg0, arg1 string) error {
+func (m *MockUserTokenRepository) InsertUserToken(arg0 context.Context, arg1, arg2 string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "InsertUserToken", arg0, arg1)
+	ret := m.ctrl.Call(m, "InsertUserToken", arg0, arg1, arg2)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // InsertUserToken indicates an expected call of InsertUserToken.
-func (mr *MockUserTokenRepositoryMockRecorder) InsertUserToken(arg0, arg1 any) *gomock.Call {
+func (mr *MockUserTokenRepositoryMockRecorder) InsertUserToken(arg0, arg1, arg2 any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertUserToken", reflect.TypeOf((*MockUserTokenRepository)(nil).InsertUserToken), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertUserToken", reflect.TypeOf((*MockUserTokenRepository)(nil).InsertUserToken), arg0, arg1, arg2)
 }

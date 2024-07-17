@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"context"
+
 	"github.com/google/uuid"
 	"github.com/idzharbae/digital-wallet/src/internal/repository"
 	"github.com/palantir/stacktrace"
@@ -16,9 +18,9 @@ func NewUser(userTokenRepository repository.UserTokenRepository) UserUC {
 	}
 }
 
-func (u *User) RegisterUser(username string) (string, error) {
+func (u *User) RegisterUser(ctx context.Context, username string) (string, error) {
 	token := uuid.New()
-	if err := u.userTokenRepository.InsertUserToken(username, token.String()); err != nil {
+	if err := u.userTokenRepository.InsertUserToken(ctx, username, token.String()); err != nil {
 		return "", stacktrace.Propagate(err, "RegisterUser: failed to insert token")
 	}
 

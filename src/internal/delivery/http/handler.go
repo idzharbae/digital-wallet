@@ -108,7 +108,7 @@ func (s *HttpServer) RegisterUser(c *gin.Context) {
 		return
 	}
 
-	token, err := s.userUC.RegisterUser(request.Username)
+	token, err := s.userUC.RegisterUser(c.Request.Context(), request.Username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": err.Error(),
