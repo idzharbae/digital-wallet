@@ -16,9 +16,15 @@ import (
 
 func TestHttpHandler(t *testing.T) {
 	Convey("Test Register User", t, func() {
-		ctrl := gomock.NewController(t)
-		ucMock := ucmock.NewMockUserUC(ctrl)
-		server := http.NewServer(nil, ucMock, nil)
+		var transactionUCMock *ucmock.MockTransactionUC
+		var userUCMock *ucmock.MockUserUC
+
+		setup := func(t *testing.T) (*gomock.Controller, *http.HttpServer) {
+			ctrl := gomock.NewController(t)
+			userUCMock = ucmock.NewMockUserUC(ctrl)
+			transactionUCMock = ucmock.NewMockTransactionUC(ctrl)
+			return ctrl, http.NewServer(userUCMock, transactionUCMock)
+		}
 
 		type Response struct {
 			Message string `json:"message"`
@@ -26,6 +32,9 @@ func TestHttpHandler(t *testing.T) {
 		}
 
 		Convey("Must return error if username field is empty", func() {
+			ctrl, server := setup(t)
+			defer ctrl.Finish()
+
 			w := httptest.NewRecorder()
 			c, _ := gin.CreateTestContext(w)
 			c.Request = httptest.NewRequest("POST", "/create_user", strings.NewReader(`{}`))
@@ -39,11 +48,14 @@ func TestHttpHandler(t *testing.T) {
 		})
 
 		Convey("Must return error if usecase returned error", func() {
+			ctrl, server := setup(t)
+			defer ctrl.Finish()
+
 			w := httptest.NewRecorder()
 			c, _ := gin.CreateTestContext(w)
 			c.Request = httptest.NewRequest("POST", "/create_user", strings.NewReader(`{"username": "test"}`))
 
-			ucMock.EXPECT().RegisterUser(c.Request.Context(), "test").Return("", errors.New("Error!"))
+			userUCMock.EXPECT().RegisterUser(c.Request.Context(), "test").Return("", errors.New("Error!"))
 
 			server.RegisterUser(c)
 
@@ -54,11 +66,14 @@ func TestHttpHandler(t *testing.T) {
 		})
 
 		Convey("Must return token if usecase raised no error", func() {
+			ctrl, server := setup(t)
+			defer ctrl.Finish()
+
 			w := httptest.NewRecorder()
 			c, _ := gin.CreateTestContext(w)
 			c.Request = httptest.NewRequest("POST", "/create_user", strings.NewReader(`{"username": "test"}`))
 
-			ucMock.EXPECT().RegisterUser(c.Request.Context(), "test").Return("asdfg", nil)
+			userUCMock.EXPECT().RegisterUser(c.Request.Context(), "test").Return("asdfg", nil)
 
 			server.RegisterUser(c)
 

@@ -15,13 +15,21 @@ import (
 
 func TestUser(t *testing.T) {
 	Convey("Test Register User", t, func() {
-		ctrl := gomock.NewController(t)
-		userTokenRepoMock := repomock.NewMockUserTokenRepository(ctrl)
-		userBalanceRepoMock := repomock.NewMockUserBalanceRepository(ctrl)
-		transactionHandlerMock := repomock.NewMockTransactionHandler(ctrl)
-		ctx := context.Background()
-		uc := usecase.NewUser(userTokenRepoMock, userBalanceRepoMock, transactionHandlerMock)
-		Convey("Must generate random token before inserting", func() {
+		var userTokenRepoMock *repomock.MockUserTokenRepository
+		var userBalanceRepoMock *repomock.MockUserBalanceRepository
+		var transactionHandlerMock *repomock.MockTransactionHandler
+		setup := func(t *testing.T) (*gomock.Controller, usecase.UserUC) {
+			ctrl := gomock.NewController(t)
+			userTokenRepoMock = repomock.NewMockUserTokenRepository(ctrl)
+			userBalanceRepoMock = repomock.NewMockUserBalanceRepository(ctrl)
+			transactionHandlerMock = repomock.NewMockTransactionHandler(ctrl)
+			return ctrl, usecase.NewUser(userTokenRepoMock, userBalanceRepoMock, transactionHandlerMock)
+		}
+		Convey("Must generate random token before inserting", func(c C) {
+			ctx := context.Background()
+			ctrl, uc := setup(t)
+			defer ctrl.Finish()
+
 			username := "test"
 			txMock := repomock.NewMockTx(ctrl)
 			transactionHandlerMock.EXPECT().ExecuteTransaction(gomock.Any(), gomock.Any()).DoAndReturn(
@@ -29,10 +37,12 @@ func TestUser(t *testing.T) {
 					return f(txMock)
 				})
 
-			userTokenRepoMock.EXPECT().WithTransaction(txMock).Return(userTokenRepoMock)
-			userTokenRepoMock.EXPECT().InsertUserToken(ctx, username, gomock.Any()).Return(nil).Times(1)
-			userBalanceRepoMock.EXPECT().WithTransaction(txMock).Return(userBalanceRepoMock)
-			userBalanceRepoMock.EXPECT().CreateUserBalance(ctx, username).Return(nil).Times(1)
+			gomock.InOrder(
+				userTokenRepoMock.EXPECT().WithTransaction(txMock).Return(userTokenRepoMock),
+				userTokenRepoMock.EXPECT().InsertUserToken(ctx, username, gomock.Any()).Return(nil).Times(1),
+				userBalanceRepoMock.EXPECT().WithTransaction(txMock).Return(userBalanceRepoMock),
+				userBalanceRepoMock.EXPECT().CreateUserBalance(ctx, username).Return(nil).Times(1),
+			)
 
 			token, err := uc.RegisterUser(ctx, username)
 			So(err, ShouldBeNil)
@@ -40,6 +50,10 @@ func TestUser(t *testing.T) {
 		})
 
 		Convey("Must return error when an error occured", func() {
+			ctx := context.Background()
+			ctrl, uc := setup(t)
+			defer ctrl.Finish()
+
 			username := "test"
 			txMock := repomock.NewMockTx(ctrl)
 			transactionHandlerMock.EXPECT().ExecuteTransaction(gomock.Any(), gomock.Any()).DoAndReturn(
@@ -47,10 +61,12 @@ func TestUser(t *testing.T) {
 					return f(txMock)
 				})
 
-			userTokenRepoMock.EXPECT().WithTransaction(txMock).Return(userTokenRepoMock)
-			userTokenRepoMock.EXPECT().InsertUserToken(ctx, username, gomock.Any()).Return(nil).Times(1)
-			userBalanceRepoMock.EXPECT().WithTransaction(txMock).Return(userBalanceRepoMock)
-			userBalanceRepoMock.EXPECT().CreateUserBalance(ctx, username).Return(errors.New("error")).Times(1)
+			gomock.InOrder(
+				userTokenRepoMock.EXPECT().WithTransaction(txMock).Return(userTokenRepoMock),
+				userTokenRepoMock.EXPECT().InsertUserToken(ctx, username, gomock.Any()).Return(nil).Times(1),
+				userBalanceRepoMock.EXPECT().WithTransaction(txMock).Return(userBalanceRepoMock),
+				userBalanceRepoMock.EXPECT().CreateUserBalance(ctx, username).Return(errors.New("error")).Times(1),
+			)
 
 			_, err := uc.RegisterUser(ctx, username)
 			So(stacktrace.RootCause(err), ShouldResemble, errors.New("error"))
@@ -74,9 +90,11 @@ func TestUser(t *testing.T) {
 					return f(txMock)
 				})
 
-			userBalanceRepoMock.EXPECT().WithTransaction(txMock).Return(userBalanceRepoMock)
-			userBalanceRepoMock.EXPECT().GetUserBalanceForUpdate(ctx, username).Return(currentBalance, nil).Times(1)
-			userBalanceRepoMock.EXPECT().UpdateBalance(ctx, username, topUpAmount+currentBalance).Return(nil).Times(1)
+			gomock.InOrder(
+				userBalanceRepoMock.EXPECT().WithTransaction(txMock).Return(userBalanceRepoMock),
+				userBalanceRepoMock.EXPECT().GetUserBalanceForUpdate(ctx, username).Return(currentBalance, nil).Times(1),
+				userBalanceRepoMock.EXPECT().UpdateBalance(ctx, username, topUpAmount+currentBalance).Return(nil).Times(1),
+			)
 
 			newBalance, err := uc.TopUpUserBalance(ctx, username, topUpAmount)
 			So(err, ShouldBeNil)
@@ -94,9 +112,11 @@ func TestUser(t *testing.T) {
 					return f(txMock)
 				})
 
-			userBalanceRepoMock.EXPECT().WithTransaction(txMock).Return(userBalanceRepoMock)
-			userBalanceRepoMock.EXPECT().GetUserBalanceForUpdate(ctx, username).Return(currentBalance, nil).Times(1)
-			userBalanceRepoMock.EXPECT().UpdateBalance(ctx, username, topUpAmount+currentBalance).Return(errors.New("error")).Times(1)
+			gomock.InOrder(
+				userBalanceRepoMock.EXPECT().WithTransaction(txMock).Return(userBalanceRepoMock),
+				userBalanceRepoMock.EXPECT().GetUserBalanceForUpdate(ctx, username).Return(currentBalance, nil).Times(1),
+				userBalanceRepoMock.EXPECT().UpdateBalance(ctx, username, topUpAmount+currentBalance).Return(errors.New("error")).Times(1),
+			)
 
 			newBalance, err := uc.TopUpUserBalance(ctx, username, topUpAmount)
 			So(stacktrace.RootCause(err), ShouldResemble, errors.New("error"))
@@ -109,6 +129,19 @@ func TestUser(t *testing.T) {
 
 			_, err := uc.TopUpUserBalance(ctx, username, topUpAmount)
 			So(stacktrace.RootCause(err), ShouldResemble, usecase.ErrTopUpTooLarge)
+		})
+
+		Convey("Must return error when amount <= 0", func() {
+			username := "test"
+			topUpAmount := 0
+
+			_, err := uc.TopUpUserBalance(ctx, username, topUpAmount)
+			So(stacktrace.RootCause(err), ShouldResemble, usecase.ErrInvalidTopUpAmount)
+
+			topUpAmount = -123
+
+			_, err = uc.TopUpUserBalance(ctx, username, topUpAmount)
+			So(stacktrace.RootCause(err), ShouldResemble, usecase.ErrInvalidTopUpAmount)
 		})
 	})
 }

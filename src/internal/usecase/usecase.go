@@ -14,6 +14,7 @@ type UserUC interface {
 	TopUpUserBalance(ctx context.Context, username string, topUpAmount int) (int, error)
 }
 
+//go:generate mockgen -destination=ucmock/transaction_uc.go -package=ucmock github.com/idzharbae/digital-wallet/src/internal/usecase TransactionUC
 type TransactionUC interface {
 	TransferBalance(ctx context.Context, senderUsername, recipientUsername string, trasnferAmount int) error
 	GetTopTransactingUsers(ctx context.Context) ([]entity.TotalDebit, error)

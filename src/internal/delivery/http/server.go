@@ -3,20 +3,18 @@ package http
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/idzharbae/digital-wallet/src/internal/delivery/http/middlewares"
-	"github.com/idzharbae/digital-wallet/src/internal/gateway/rmq_gateway"
 	"github.com/idzharbae/digital-wallet/src/internal/usecase"
 	"github.com/rs/zerolog/log"
 )
 
 type HttpServer struct {
-	engine      *gin.Engine
-	rmqProducer *rmq_gateway.RMQProducer
+	engine *gin.Engine
 
 	userUC        usecase.UserUC
 	transactionUC usecase.TransactionUC
 }
 
-func NewServer(rmqProducer *rmq_gateway.RMQProducer, userUC usecase.UserUC, transactionUC usecase.TransactionUC) *HttpServer {
+func NewServer(userUC usecase.UserUC, transactionUC usecase.TransactionUC) *HttpServer {
 	log.Info().Msg("Initializing service")
 
 	// Create barebone engine
@@ -33,7 +31,6 @@ func NewServer(rmqProducer *rmq_gateway.RMQProducer, userUC usecase.UserUC, tran
 
 	server := &HttpServer{
 		engine:        engine,
-		rmqProducer:   rmqProducer,
 		userUC:        userUC,
 		transactionUC: transactionUC,
 	}

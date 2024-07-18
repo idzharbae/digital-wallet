@@ -11,7 +11,8 @@ import (
 )
 
 var (
-	ErrTopUpTooLarge = errors.New("top up amount is too large")
+	ErrTopUpTooLarge      = errors.New("top up amount is too large")
+	ErrInvalidTopUpAmount = errors.New("invalid top up amount")
 )
 
 type User struct {
@@ -69,6 +70,10 @@ func (u *User) GetUserBalance(ctx context.Context, username string) (int, error)
 func (u *User) TopUpUserBalance(ctx context.Context, username string, topUpAmount int) (int, error) {
 	if topUpAmount >= 10000000 {
 		return 0, ErrTopUpTooLarge
+	}
+
+	if topUpAmount <= 0 {
+		return 0, ErrInvalidTopUpAmount
 	}
 
 	var newBalance int

@@ -55,7 +55,7 @@ func SetupApp(conf AppConf) (*DigitalWalletApp, error) {
 	transactionHandler := repository.NewTransactionHandler(pgPool)
 	userUC := usecase.NewUser(userTokenRepo, userBalanceRepo, transactionHandler)
 	transactionUC := usecase.NewTransaction(transactionHandler, userTransactionRepo, userBalanceRepo, rmqProducer)
-	httpServer := http.NewServer(rmqProducer, userUC, transactionUC)
+	httpServer := http.NewServer(userUC, transactionUC)
 	rmqConsumer := rabbitmq.NewConsumer(rmqConsumerConn, userTransactionRepo)
 	cronJob := cronjob.NewCron(cron.New(), userTransactionRepo)
 

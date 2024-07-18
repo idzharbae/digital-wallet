@@ -33,6 +33,7 @@ type UserBalanceRepository interface {
 	WithTransaction(tx pgx.Tx) UserBalanceRepository
 }
 
+//go:generate mockgen -destination=repomock/usertransaction_mock.go -package=repomock github.com/idzharbae/digital-wallet/src/internal/repository UserTransactionRepository
 type UserTransactionRepository interface {
 	InsertTransaction(ctx context.Context, username, secondPartyUsername string, transactionType entity.TransactionType, amount int) error
 	UpsertTotalDebit(ctx context.Context, username string, amount int) error
