@@ -1,5 +1,8 @@
 # Go Digital Wallet
 
+## Install Go Migrate
+Refer to the repo README: https://github.com/golang-migrate/migrate/blob/master/cmd/migrate/README.md
+
 ## Running migrations
 ```
 docker-compose up -d
